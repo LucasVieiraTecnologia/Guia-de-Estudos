@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guia de Estudos DS com IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overscroll-behavior-y: contain;
+        }
+        details > summary {
+            list-style: none;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] summary .arrow-down {
+            transform: rotate(180deg);
+        }
+        .content-card {
+            background-color: white;
+            border-radius: 0.75rem; /* 12px */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1rem; /* 16px */
+            padding: 1rem; /* 16px */
+        }
+        .content-card summary, .checklist-summary { /* Added .checklist-summary */
+            font-weight: 600;
+            color: #1f2937; /* gray-800 */
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content-card ul {
+            margin-top: 0.75rem; /* 12px */
+            list-style-type: disc;
+            padding-left: 1.25rem; /* 20px */
+            color: #4b5563; /* gray-600 */
+        }
+        .content-card ul li {
+            margin-bottom: 0.5rem; /* 8px */
+        }
+        .quick-link {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem;
+            background-color: #f3f4f6; /* gray-100 */
+            border-radius: 0.5rem; /* 8px */
+            color: #3b82f6; /* blue-500 */
+            text-decoration: none;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        .quick-link:hover {
+            background-color: #e5e7eb; /* gray-200 */
+        }
+        .quick-link svg {
+            margin-right: 0.5rem; /* 8px */
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Chat Styles */
+        .chat-container {
+            height: 300px; 
+            overflow-y: auto;
+            border: 1px solid #e5e7eb; 
+            border-radius: 0.5rem; 
+            padding: 0.75rem; 
+            margin-bottom: 0.75rem; 
+            background-color: #f9fafb; 
+        }
+        .chat-message {
+            padding: 0.5rem 0.75rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.5rem;
+            max-width: 80%;
+            word-wrap: break-word;
+            white-space: pre-wrap; 
+        }
+        .user-message {
+            background-color: #3b82f6; 
+            color: white;
+            margin-left: auto; 
+            text-align: right;
+        }
+        .ai-message {
+            background-color: #e5e7eb; 
+            color: #1f2937; 
+            margin-right: auto; 
+            text-align: left;
+        }
+        .loading-message {
+            color: #6b7280; 
+            font-style: italic;
+        }
+
+        /* Checklist Styles */
+        .checklist-details-card { /* New class for the details element wrapping checklist */
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            margin-bottom: 1rem;
+            /* Padding will be on summary and content div */
+        }
+        .checklist-summary { /* For the summary element of the checklist */
+             padding: 1rem; /* Same padding as .content-card summary */
+        }
+        .checklist-main-container { 
+            padding: 0 1rem 1rem 1rem; /* Padding for the content area of checklist */
+        }
+        .checklist-section-title {
+            font-weight: 600;
+            color: #111827; /* gray-900 */
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        .checklist-section-title:first-child {
+            margin-top: 0;
+        }
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0;
+        }
+        .checklist-item input[type="checkbox"] {
+            margin-right: 0.75rem; 
+            height: 1.15rem; 
+            width: 1.15rem; 
+            accent-color: #3b82f6; 
+            flex-shrink: 0; 
+        }
+        .checklist-item label {
+            color: #374151; 
+            flex-grow: 1;
+            font-size: 0.875rem; 
+            line-height: 1.25rem;
+        }
+        .checklist-item label.completed {
+            text-decoration: line-through;
+            color: #9ca3af; 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+    <div class="container mx-auto max-w-2xl p-4 min-h-screen">
+        <header class="mb-8 text-center">
+            <h1 class="text-3xl font-bold text-sky-600">Meu Guia de Estudos DS</h1>
+            <p class="text-slate-600">Sua jornada para se tornar Cientista de Dados Pleno!</p>
+        </header>
+
+        <section class="mb-8">
+            <details class="checklist-details-card">
+                <summary class="checklist-summary">
+                    <h2 class="text-2xl font-semibold text-sky-700 inline">Meu Checklist do Plano de Estudos</h2>
+                    <svg class="w-6 h-6 arrow-down transition-transform duration-200 text-sky-700" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <div id="checklistContainer" class="checklist-main-container">
+                    <p id="loadingChecklistMsg" class="text-slate-500">Carregando checklist...</p>
+                </div>
+            </details>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-700">Plano de Estudos Detalhado (Referência)</h2>
+            <details class="content-card">
+                <summary>
+                    <span>Meses 1-3: Fundamentos Sólidos</span>
+                    <svg class="w-6 h-6 arrow-down transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <ul class="mt-3 space-y-2 text-sm">
+                    <li><strong>Programação Python:</strong> Sintaxe, Funções, NumPy, Pandas.</li>
+                    <li><strong>Matemática e Estatística:</strong> Álgebra Linear, Cálculo (conceitos), Estatística Descritiva, Probabilidade.</li>
+                    <li><strong>SQL:</strong> Comandos básicos (`SELECT`, `FROM`, `WHERE`, `GROUP BY`, `JOIN`).</li>
+                    <li><strong>Ferramentas:</strong> Git, GitHub, Jupyter Notebooks/Google Colab.</li>
+                    <li><strong>Prática:</strong> Problemas de lógica, análise de datasets pequenos (ex: Titanic).</li>
+                </ul>
+            </details>
+            <details class="content-card">
+                <summary>
+                    <span>Meses 4-6: Machine Learning e Análise</span>
+                    <svg class="w-6 h-6 arrow-down transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                 <ul class="mt-3 space-y-2 text-sm">
+                    <li><strong>Análise Exploratória de Dados (EDA):</strong> Limpeza avançada, visualização (Matplotlib, Seaborn).</li>
+                    <li><strong>Machine Learning - Conceitos:</strong> Tipos de aprendizado, Overfitting, Validação Cruzada.</li>
+                    <li><strong>ML - Algoritmos Supervisionados:</strong> Regressão, Classificação (Logística, KNN, SVM, Árvores, Naive Bayes). Métricas.</li>
+                    <li><strong>ML - Algoritmos Não Supervisionados:</strong> Clusterização (K-Means), Redução de Dimensionalidade (PCA).</li>
+                    <li><strong>Prática:</strong> Competições Kaggle (iniciante), projetos de EDA, implementação de modelos com Scikit-learn.</li>
+                </ul>
+            </details>
+            <details class="content-card">
+                <summary>
+                    <span>Meses 7-9: Tópicos Avançados</span>
+                    <svg class="w-6 h-6 arrow-down transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                 <ul class="mt-3 space-y-2 text-sm">
+                    <li><strong>Engenharia de Features:</strong> Criação, seleção, encoding, normalização.</li>
+                    <li><strong>ML Avançado:</strong> Métodos Ensemble (Random Forests, Gradient Boosting), Introdução a Redes Neurais (opcional).</li>
+                    <li><strong>Análise de Séries Temporais:</strong> ARIMA, Prophet (opcional).</li>
+                    <li><strong>Visualização Avançada:</strong> Plotly, Dash, Power BI/Tableau (introdução).</li>
+                    <li><strong>Big Data (Conceitual):</strong> Hadoop, Spark.</li>
+                    <li><strong>Prática:</strong> Projetos de ponta a ponta, replicar estudos.</li>
+                </ul>
+            </details>
+            <details class="content-card">
+                <summary>
+                    <span>Meses 10-12: Portfólio e Mercado</span>
+                    <svg class="w-6 h-6 arrow-down transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <ul class="mt-3 space-y-2 text-sm">
+                    <li><strong>Construção de Portfólio:</strong> Projetos no GitHub, documentação, blog/Medium.</li>
+                    <li><strong>Storytelling com Dados:</strong> Comunicar resultados de forma clara.</li>
+                    <li><strong>MLOps (Conceitual):</strong> Ciclo de vida de modelos, deploy básico.</li>
+                    <li><strong>Cloud (Básico):</strong> AWS, Azure ou GCP (serviços de ML).</li>
+                    <li><strong>Preparação para Entrevistas:</strong> Técnicas, cases de negócio, comportamentais.</li>
+                    <li><strong>Networking:</strong> Comunidades, LinkedIn.</li>
+                </ul>
+            </details>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-700">Recursos Rápidos</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <a href="https://www.python.org/doc/" target="_blank" class="quick-link">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A1 1 0 0111.293 2.707l1.414 1.414a1 1 0 01.293.707V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"></path></svg>
+                    <span>Python Docs</span>
+                </a>
+                <a href="https://pandas.pydata.org/docs/" target="_blank" class="quick-link">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M7 3a1 1 0 000 2h6a1 1 0 100-2H7zM4 7a1 1 0 011-1h10a1 1 0 110 2H5a1 1 0 01-1-1zM2 11a2 2 0 012-2h12a2 2 0 012 2v4a2 2 0 01-2 2H4a2 2 0 01-2-2v-4z"></path></svg>
+                    <span>Pandas Docs</span>
+                </a>
+                <a href="https://numpy.org/doc/" target="_blank" class="quick-link">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M5 3a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V5a2 2 0 00-2-2H5zm0 2h10v7h-2V7H5v3zm5 0h2v5h-2V5z" clip-rule="evenodd"></path></svg>
+                    <span>NumPy Docs</span>
+                </a>
+                <a href="https://scikit-learn.org/stable/user_guide.html" target="_blank" class="quick-link">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.84l-7-3zM3.01 9.355L2 10V4h1v5.355zM17.01 9.355L18 10V4h-1v5.355zM5.293 11.707a1 1 0 010-1.414l.707-.707a1 1 0 011.414 0L10 12.172l2.586-2.586a1 1 0 111.414 1.414l-.707.707a1 1 0 01-1.414 0L10 13.828l-2.293 2.293a1 1 0 01-1.414 0l-.707-.707a1 1 0 010-1.414zM10 15.586l.293.293a1 1 0 01-1.414 1.414l-1-1a1 1 0 010-1.414l.707-.707 1.414 1.414.001-.001z"></path></svg>
+                    <span>Scikit-learn Guide</span>
+                </a>
+                <a href="https://www.kaggle.com/" target="_blank" class="quick-link">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"></path></svg>
+                    <span>Kaggle</span>
+                </a>
+                <a href="https://www.sqlzoo.net/" target="_blank" class="quick-link">
+                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3zM3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3s-7-1.343-7-3zM3 4a1 1 0 011-1h12a1 1 0 011 1v1c0 1.657-3.134 3-7 3S3 6.657 3 5V4z"></path></svg>
+                    <span>SQLZoo (Prática SQL)</span>
+                </a>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-700">Dicas para o Sucesso</h2>
+            <div class="content-card bg-sky-50 border border-sky-200">
+                <ul class="list-none p-0 text-sm space-y-3">
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span><strong>Consistência:</strong> Dedique tempo regularmente. 1-2 horas focadas por dia valem ouro!</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span><strong>Mão na Massa:</strong> A prática leva à perfeição. Aplique tudo em projetos.</span>
+                    </li>
+                    <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span><strong>Construa um Portfólio:</strong> Seus projetos são seu cartão de visita. Mostre o que sabe!</span>
+                    </li>
+                     <li class="flex items-start">
+                        <svg class="w-5 h-5 text-sky-600 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        <span><strong>Não Tenha Medo de Errar:</strong> Faz parte do aprendizado. Cada erro é uma lição.</span>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="mb-8">
+            <h2 class="text-2xl font-semibold mb-4 text-sky-700">IA Assistente de Estudos</h2>
+            <div class="content-card">
+                <div id="chatDisplay" class="chat-container">
+                    </div>
+                <div class="mt-4 flex">
+                    <input type="text" id="userInput" class="flex-grow border border-gray-300 rounded-l-md p-2 focus:ring-sky-500 focus:border-sky-500" placeholder="Pergunte sobre o plano de estudos...">
+                    <button id="sendButton" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold p-2 rounded-r-md">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <footer class="text-center py-8">
+            <p class="text-sm text-slate-500">&copy; <span id="currentYear"></span> Seu Guia de Estudos DS. Foco e força!</p>
+        </footer>
+    </div>
+
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        const detailsElements = document.querySelectorAll('details.content-card, details.checklist-details-card'); // Include checklist details
+        detailsElements.forEach(details => {
+            details.addEventListener('toggle', event => {
+                if (details.open) {
+                    detailsElements.forEach(otherDetails => {
+                        if (otherDetails !== details && otherDetails.open) {
+                            otherDetails.removeAttribute('open');
+                        }
+                    });
+                }
+            });
+        });
+
+        const chatDisplay = document.getElementById('chatDisplay');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        
+        const checklistContainer = document.getElementById('checklistContainer');
+        const loadingChecklistMsg = document.getElementById('loadingChecklistMsg');
+
+
+        const studyPlanContext = `
+Você é um assistente virtual especializado em um plano de estudos para formação de Cientista de Dados em 1 ano.
+Sua principal função é responder perguntas usando o seguinte plano de estudos como base principal.
+Se a informação não estiver no plano ou precisar de complementação, você PODE buscar informações adicionais na internet para fornecer uma resposta mais completa, mas sempre priorize e referencie o plano de estudos quando aplicável.
+Se a pergunta do usuário for muito genérica e não relacionada a ciência de dados ou ao plano, peça para que ele foque em perguntas sobre o plano de estudos ou tópicos relacionados.
+
+--- INÍCIO DO PLANO DE ESTUDOS ---
+
+# Plano de Estudos Acelerado para Cientista de Dados em 1 Ano
+
+## Pilares Fundamentais da Ciência de Dados
+1.  **Programação:** Python (Pandas, NumPy, Scikit-learn), SQL.
+2.  **Estatística e Matemática:** Probabilidade, estatística descritiva/inferencial, álgebra linear, cálculo.
+3.  **Machine Learning:** Algoritmos supervisionados/não supervisionados, avaliação, engenharia de features.
+4.  **Visualização de Dados:** Matplotlib, Seaborn, Plotly, Power BI/Tableau.
+5.  **Comunicação e Negócios:** Traduzir problemas de negócio, comunicar resultados.
+6.  **Engenharia de Dados (Básico):** Coleta, limpeza, transformação, armazenamento.
+
+## Cronograma Detalhado
+
+### Meses 1-3: Fundamentos Sólidos
+- **Foco:** Base em programação, matemática, estatística.
+- **Programação (Python):** Sintaxe, estruturas, funções, OOP básica, NumPy (arrays, operações), Pandas (DataFrames, Series, I/O, manipulação básica). Recursos: Tutoriais Python.org, DataCamp, Codecademy, livros "Python Fluente", "Pense em Python".
+- **Matemática e Estatística:** Álgebra Linear (vetores, matrizes), Cálculo (derivadas, gradientes - conceitual), Estatística Descritiva (médias, medianas, desvio padrão, distribuições), Probabilidade (conceitos básicos). Recursos: Khan Academy, Coursera/edX.
+- **SQL:** Comandos (SELECT, FROM, WHERE, GROUP BY, JOIN). Prática: SQLZoo, HackerRank.
+- **Ferramentas:** Git, GitHub, Jupyter Notebooks/Google Colab.
+- **Prática:** Problemas de lógica (LeetCode, HackerRank), análise de datasets pequenos (ex: Titanic com Pandas).
+
+### Meses 4-6: Mergulho em Machine Learning e Análise de Dados
+- **Foco:** Principais algoritmos de ML, aprofundar em EDA.
+- **Análise Exploratória de Dados (EDA):** Limpeza avançada (missing values, outliers), visualização para insights (Matplotlib, Seaborn), identificação de padrões/correlações.
+- **Machine Learning - Conceitos:** Aprendizado Supervisionado, Não Supervisionado, Por Reforço. Overfitting/Underfitting, Viés/Variância. Validação Cruzada.
+- **Machine Learning - Algoritmos Supervisionados:** Regressão (Linear, Múltipla, Polinomial), Classificação (Regressão Logística, KNN, SVMs básicos, Árvores de Decisão, Naive Bayes). Métricas de Avaliação (MAE, MSE, RMSE, R², Acurácia, Precisão, Recall, F1, Curva ROC, AUC). Recursos: "Introdução ao Aprendizado de Máquina com Python", cursos Andrew Ng (Coursera).
+- **Machine Learning - Algoritmos Não Supervisionados:** Clusterização (K-Means, DBSCAN), Redução de Dimensionalidade (PCA).
+- **Prática:** Competições Kaggle (iniciante), projetos de EDA completos, implementação de modelos ML (do zero e com Scikit-learn).
+
+### Meses 7-9: Tópicos Avançados e Especialização
+- **Foco:** Técnicas avançadas, especializações, projetos robustos.
+- **Engenharia de Features:** Criação, seleção, encoding (One-Hot, Label), normalização/padronização.
+- **Machine Learning Avançado:** Métodos Ensemble (Random Forests, Gradient Boosting - XGBoost, LightGBM, CatBoost). Introdução a Redes Neurais e Deep Learning (opcional - perceptrons, camadas, TensorFlow/Keras ou PyTorch). Recursos: DeepLearning.AI, Fast.ai.
+- **Análise de Séries Temporais (se aplicável):** Conceitos (tendência, sazonalidade), Modelos (ARIMA, Prophet).
+- **Visualização de Dados Avançada:** Plotly, Dash (dashboards interativos). Introdução a Power BI/Tableau.
+- **Introdução a Big Data (Conceitual):** O que é (3 Vs), conceitos Hadoop/Spark.
+- **Prática:** 2-3 projetos de ponta a ponta (coleta à avaliação), replicar artigos/estudos.
+
+### Meses 10-12: Portfólio, Soft Skills e Preparação para o Mercado
+- **Foco:** Portfólio forte, soft skills, preparação para entrevistas.
+- **Construção de Portfólio:** Refinar projetos, documentação no GitHub (README, código limpo), blog/Medium.
+- **Storytelling com Dados:** Comunicar resultados de forma clara e persuasiva.
+- **Introdução a MLOps (Conceitual):** O que é, ciclo de vida de modelos, ferramentas (MLflow), noções de deploy (Flask/FastAPI).
+- **Cloud (Básico):** Familiarização com AWS, Azure ou GCP e seus serviços de ML.
+- **Preparação para Entrevistas:** Técnicas (estatística, ML, Python, SQL, coding challenges), Cases de Negócio, Comportamentais. Recursos: "Cracking the Coding Interview", "Ace the Data Science Interview".
+- **Networking:** Comunidades online, webinars, LinkedIn.
+
+## Recursos Chave Adicionais
+- **Plataformas de Cursos:** Coursera, edX, Udemy, DataCamp, Alura, Udacity, freeCodeCamp.
+- **Livros:** "Python for Data Analysis" (McKinney), "The Hundred-Page Machine Learning Book" (Burkov), "Storytelling with Data" (Knaflic).
+- **Comunidades:** Kaggle, Stack Overflow, Reddit (r/datascience, r/MachineLearning).
+
+## Dicas para o Sucesso
+Consistência, Mão na Massa, Construa um Portfólio, Não Tenha Medo de Errar, Ensine o que Aprendeu, Mantenha-se Atualizado, Cuide da Saúde Mental.
+--- FIM DO PLANO DE ESTUDOS ---
+`;
+
+        function addMessageToChat(message, sender) {
+            const messageElement = document.createElement('p');
+            messageElement.classList.add('chat-message', sender === 'user' ? 'user-message' : 'ai-message');
+            messageElement.textContent = message; 
+            chatDisplay.appendChild(messageElement);
+            chatDisplay.scrollTop = chatDisplay.scrollHeight; 
+        }
+        
+        addMessageToChat("Olá! Sou seu assistente para o Plano de Estudos de Ciência de Dados. Use o plano como base e, se precisar, buscarei mais informações para você!", 'ai');
+
+        function addLoadingMessage() {
+            const loadingElement = document.createElement('p');
+            loadingElement.id = 'loadingIndicator';
+            loadingElement.classList.add('chat-message', 'ai-message', 'loading-message');
+            loadingElement.textContent = 'A IA está pesquisando e digitando...';
+            chatDisplay.appendChild(loadingElement);
+            chatDisplay.scrollTop = chatDisplay.scrollHeight;
+            return loadingElement;
+        }
+
+        function removeLoadingMessage() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+                loadingIndicator.remove();
+            }
+        }
+
+        async function callGeminiAPI(promptText) {
+            const loadingIndicator = addLoadingMessage();
+            
+            const fullPrompt = studyPlanContext + "\n\nPergunta do usuário (use o plano como base principal, mas pode buscar na internet para complementar, se necessário):\n" + promptText;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: fullPrompt }] });
+            
+            const payload = { contents: chatHistory };
+            // IMPORTANTE: Substitua "" pela sua chave de API do Gemini se estiver rodando este arquivo localmente.
+            const apiKey = "AIzaSyB03lQTBf0y8AZudE62sYdVp8Qw7Xy2dYk"; // Se estiver no ambiente Canvas, a chave é injetada automaticamente.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                removeLoadingMessage();
+                if (!response.ok) {
+                    const errorBody = await response.text();
+                    console.error("API Error Response:", errorBody);
+                    addMessageToChat(`Erro na API: ${response.status}. Verifique sua chave de API. Detalhes: ${errorBody}`, 'ai');
+                    return;
+                }
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const aiResponse = result.candidates[0].content.parts[0].text;
+                    addMessageToChat(aiResponse, 'ai');
+                } else {
+                    if (result.promptFeedback && result.promptFeedback.blockReason) {
+                        console.error("API bloqueou o prompt:", result.promptFeedback);
+                        addMessageToChat(`Sua pergunta foi bloqueada pela API: ${result.promptFeedback.blockReason}. Tente reformular.`, 'ai');
+                    } else {
+                        console.error("Resposta da API inesperada:", result);
+                        addMessageToChat("Desculpe, não consegui processar (resposta inesperada da API).", 'ai');
+                    }
+                }
+            } catch (error) {
+                removeLoadingMessage();
+                console.error("Erro ao chamar a API Gemini:", error);
+                addMessageToChat("Ocorreu um erro ao obter uma resposta. Verifique sua conexão/chave de API.", 'ai');
+            }
+        }
+
+        sendButton.addEventListener('click', async () => {
+            const messageText = userInput.value.trim();
+            if (messageText) {
+                addMessageToChat(messageText, 'user');
+                userInput.value = ''; 
+                await callGeminiAPI(messageText);
+            }
+        });
+
+        userInput.addEventListener('keypress', async (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); 
+                const messageText = userInput.value.trim();
+                if (messageText) {
+                    addMessageToChat(messageText, 'user');
+                    userInput.value = ''; 
+                    await callGeminiAPI(messageText);
+                }
+            }
+        });
+
+        // --- Checklist Functionality ---
+        let checklistMasterData = [
+            // Meses 1-3
+            { sectionTitle: "Meses 1-3: Fundamentos Sólidos", id: "s1", isTitle: true },
+            { text: "Programação Python: Sintaxe, Funções, NumPy, Pandas.", completed: false, id: "s1_python", sectionId: "s1" },
+            { text: "Matemática e Estatística: Álgebra Linear, Cálculo (conceitos), Estatística Descritiva, Probabilidade.", completed: false, id: "s1_math_stats", sectionId: "s1" },
+            { text: "SQL: Comandos básicos (SELECT, FROM, WHERE, GROUP BY, JOIN).", completed: false, id: "s1_sql", sectionId: "s1" },
+            { text: "Ferramentas: Git, GitHub, Jupyter Notebooks/Google Colab.", completed: false, id: "s1_tools", sectionId: "s1" },
+            { text: "Prática: Problemas de lógica, análise de datasets pequenos (ex: Titanic).", completed: false, id: "s1_practice", sectionId: "s1" },
+            // Meses 4-6
+            { sectionTitle: "Meses 4-6: Machine Learning e Análise", id: "s2", isTitle: true },
+            { text: "Análise Exploratória de Dados (EDA): Limpeza avançada, visualização (Matplotlib, Seaborn).", completed: false, id: "s2_eda", sectionId: "s2" },
+            { text: "Machine Learning - Conceitos: Tipos de aprendizado, Overfitting, Validação Cruzada.", completed: false, id: "s2_ml_concepts", sectionId: "s2" },
+            { text: "ML - Algoritmos Supervisionados: Regressão, Classificação (Logística, KNN, SVM, Árvores, Naive Bayes). Métricas.", completed: false, id: "s2_ml_supervised", sectionId: "s2" },
+            { text: "ML - Algoritmos Não Supervisionados: Clusterização (K-Means), Redução de Dimensionalidade (PCA).", completed: false, id: "s2_ml_unsupervised", sectionId: "s2" },
+            { text: "Prática: Competições Kaggle (iniciante), projetos de EDA, implementação de modelos com Scikit-learn.", completed: false, id: "s2_ml_practice", sectionId: "s2" },
+            // Meses 7-9
+            { sectionTitle: "Meses 7-9: Tópicos Avançados", id: "s3", isTitle: true },
+            { text: "Engenharia de Features: Criação, seleção, encoding, normalização.", completed: false, id: "s3_feature_eng", sectionId: "s3" },
+            { text: "ML Avançado: Métodos Ensemble (Random Forests, Gradient Boosting), Introdução a Redes Neurais (opcional).", completed: false, id: "s3_ml_advanced", sectionId: "s3" },
+            { text: "Análise de Séries Temporais: ARIMA, Prophet (opcional).", completed: false, id: "s3_time_series", sectionId: "s3" },
+            { text: "Visualização Avançada: Plotly, Dash, Power BI/Tableau (introdução).", completed: false, id: "s3_viz_advanced", sectionId: "s3" },
+            { text: "Big Data (Conceitual): Hadoop, Spark.", completed: false, id: "s3_big_data", sectionId: "s3" },
+            { text: "Prática: Projetos de ponta a ponta, replicar estudos.", completed: false, id: "s3_practice_advanced", sectionId: "s3" },
+            // Meses 10-12
+            { sectionTitle: "Meses 10-12: Portfólio e Mercado", id: "s4", isTitle: true },
+            { text: "Construção de Portfólio: Projetos no GitHub, documentação, blog/Medium.", completed: false, id: "s4_portfolio", sectionId: "s4" },
+            { text: "Storytelling com Dados: Comunicar resultados de forma clara.", completed: false, id: "s4_storytelling", sectionId: "s4" },
+            { text: "MLOps (Conceitual): Ciclo de vida de modelos, deploy básico.", completed: false, id: "s4_mlops", sectionId: "s4" },
+            { text: "Cloud (Básico): AWS, Azure ou GCP (serviços de ML).", completed: false, id: "s4_cloud", sectionId: "s4" },
+            { text: "Preparação para Entrevistas: Técnicas, cases de negócio, comportamentais.", completed: false, id: "s4_interviews", sectionId: "s4" },
+            { text: "Networking: Comunidades, LinkedIn.", completed: false, id: "s4_networking", sectionId: "s4" }
+        ];
+
+        let userChecklistProgress = {}; // { "itemId": true/false }
+
+        function saveChecklistProgress() {
+            localStorage.setItem('checklistUserProgressDS', JSON.stringify(userChecklistProgress));
+        }
+
+        function loadChecklistProgress() {
+            const storedProgress = localStorage.getItem('checklistUserProgressDS');
+            if (storedProgress) {
+                userChecklistProgress = JSON.parse(storedProgress);
+            }
+            // Apply progress to the master data
+            checklistMasterData.forEach(item => {
+                if (!item.isTitle && userChecklistProgress.hasOwnProperty(item.id)) {
+                    item.completed = userChecklistProgress[item.id];
+                }
+            });
+            renderChecklist();
+        }
+        
+        function renderChecklist() {
+            checklistContainer.innerHTML = ''; // Clear previous content
+            if (loadingChecklistMsg) loadingChecklistMsg.style.display = 'none';
+
+            let currentSectionDiv = null;
+
+            checklistMasterData.forEach(item => {
+                if (item.isTitle) {
+                    // Create a new div for the section if it's a title
+                    currentSectionDiv = document.createElement('div');
+                    currentSectionDiv.classList.add('checklist-section-items'); // For potential future styling of items within a section
+                    
+                    const titleElement = document.createElement('h3');
+                    titleElement.textContent = item.sectionTitle;
+                    titleElement.classList.add('checklist-section-title');
+                    checklistContainer.appendChild(titleElement);
+                    checklistContainer.appendChild(currentSectionDiv); // Append the container for items of this section
+                } else if (currentSectionDiv) { // Ensure we have a section to add items to
+                    const div = document.createElement('div');
+                    div.classList.add('checklist-item');
+                    
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.checked = item.completed;
+                    checkbox.id = `chk-${item.id}`; // Ensure unique DOM id for checkbox
+                    checkbox.dataset.itemId = item.id; // Store original item id
+                    checkbox.addEventListener('change', (e) => toggleComplete(e.target.dataset.itemId));
+                    
+                    const label = document.createElement('label');
+                    label.htmlFor = `chk-${item.id}`;
+                    label.textContent = item.text;
+                    if (item.completed) {
+                        label.classList.add('completed');
+                    }
+                    
+                    div.appendChild(checkbox);
+                    div.appendChild(label);
+                    currentSectionDiv.appendChild(div); // Add item to the current section's div
+                }
+            });
+        }
+        
+        function toggleComplete(itemId) {
+            const item = checklistMasterData.find(i => i.id === itemId && !i.isTitle);
+            if (item) {
+                item.completed = !item.completed;
+                userChecklistProgress[itemId] = item.completed; // Update progress map
+                saveChecklistProgress();
+                renderChecklist(); // Re-render to reflect changes (e.g., strikethrough)
+            }
+        }
+
+        // Initial load of checklist
+        loadChecklistProgress();
+
+    </script>
+</body>
+</html>
