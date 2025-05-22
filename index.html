@@ -27,7 +27,7 @@
             margin-bottom: 1rem; /* 16px */
             padding: 1rem; /* 16px */
         }
-        .content-card summary, .checklist-summary { /* Added .checklist-summary */
+        .content-card summary, .checklist-summary { 
             font-weight: 600;
             color: #1f2937; /* gray-800 */
             cursor: pointer;
@@ -112,18 +112,17 @@
         }
 
         /* Checklist Styles */
-        .checklist-details-card { /* New class for the details element wrapping checklist */
+        .checklist-details-card { 
             background-color: white;
             border-radius: 0.75rem;
             box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
             margin-bottom: 1rem;
-            /* Padding will be on summary and content div */
         }
-        .checklist-summary { /* For the summary element of the checklist */
-             padding: 1rem; /* Same padding as .content-card summary */
+        .checklist-summary { 
+             padding: 1rem; 
         }
         .checklist-main-container { 
-            padding: 0 1rem 1rem 1rem; /* Padding for the content area of checklist */
+            padding: 0 1rem 1rem 1rem; 
         }
         .checklist-section-title {
             font-weight: 600;
@@ -157,6 +156,54 @@
         .checklist-item label.completed {
             text-decoration: line-through;
             color: #9ca3af; 
+        }
+
+        /* Styles for Maximized Chat */
+        #iaChatSectionContainer.ia-chat-maximized {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100dvh; /* Dynamic viewport height */
+            background-color: rgba(248, 250, 252, 0.95); /* bg-slate-50 with opacity */
+            z-index: 1000;
+            padding: 0; /* No padding on the overlay itself */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0 !important;
+        }
+
+        #iaChatSectionContainer.ia-chat-maximized > .content-card {
+            width: calc(100% - 2rem); /* Full width minus some margin/padding for spacing */
+            height: calc(100% - 2rem);/* Full height minus some margin/padding for spacing */
+            max-width: 800px; 
+            max-height: 90vh; 
+            margin: 1rem; /* This acts as the spacing from screen edges */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+            padding: 1rem; /* Keep the card's internal padding */
+            overflow: hidden; /* Important to contain children */
+        }
+
+        #iaChatSectionContainer.ia-chat-maximized #chatInnerContainer { /* Wrapper for chat display and input */
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; 
+        }
+
+        #iaChatSectionContainer.ia-chat-maximized #chatDisplay {
+            flex-grow: 1; /* Chat display takes most of the space */
+            height: auto; /* Let flexbox determine height */
+        }
+
+        /* When chat is maximized, hide other direct children of body */
+        body.chat-view-active > header,
+        body.chat-view-active > section:not(#iaChatSectionContainer),
+        body.chat-view-active > footer {
+            display: none !important;
         }
     </style>
 </head>
@@ -291,16 +338,24 @@
             </div>
         </section>
 
-        <section class="mb-8">
-            <h2 class="text-2xl font-semibold mb-4 text-sky-700">IA Assistente de Estudos</h2>
+        <section class="mb-8" id="iaChatSectionContainer">
             <div class="content-card">
-                <div id="chatDisplay" class="chat-container">
-                    </div>
-                <div class="mt-4 flex">
-                    <input type="text" id="userInput" class="flex-grow border border-gray-300 rounded-l-md p-2 focus:ring-sky-500 focus:border-sky-500" placeholder="Pergunte sobre o plano de estudos...">
-                    <button id="sendButton" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold p-2 rounded-r-md">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-2xl font-semibold text-sky-700">IA Assistente de Estudos</h2>
+                    <button id="toggleChatSizeButton" title="Maximizar Chat" class="p-1 rounded-md hover:bg-sky-100 text-sky-600 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                        <svg id="maximizeIcon" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 1v4m0 0h-4m4 0l-5-5"></path></svg>
+                        <svg id="minimizeIconProper" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 4H4v6m0 0l6 6m-6-6h6m4 10h6v-6m0 0l-6-6m6 6h-6"></path></svg>
                     </button>
+                </div>
+                <div id="chatInnerContainer">
+                    <div id="chatDisplay" class="chat-container">
+                        </div>
+                    <div class="mt-4 flex">
+                        <input type="text" id="userInput" class="flex-grow border border-gray-300 rounded-l-md p-2 focus:ring-sky-500 focus:border-sky-500" placeholder="Pergunte sobre o plano de estudos...">
+                        <button id="sendButton" class="bg-sky-500 hover:bg-sky-600 text-white font-semibold p-2 rounded-r-md">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -313,7 +368,7 @@
     <script>
         document.getElementById('currentYear').textContent = new Date().getFullYear();
 
-        const detailsElements = document.querySelectorAll('details.content-card, details.checklist-details-card'); // Include checklist details
+        const detailsElements = document.querySelectorAll('details.content-card, details.checklist-details-card'); 
         detailsElements.forEach(details => {
             details.addEventListener('toggle', event => {
                 if (details.open) {
@@ -332,6 +387,13 @@
         
         const checklistContainer = document.getElementById('checklistContainer');
         const loadingChecklistMsg = document.getElementById('loadingChecklistMsg');
+
+        // IA Chat Elements
+        const iaChatSectionContainer = document.getElementById('iaChatSectionContainer');
+        // const chatInnerContainer = document.getElementById('chatInnerContainer'); // Already declared if needed elsewhere
+        const toggleChatSizeButton = document.getElementById('toggleChatSizeButton');
+        const maximizeIcon = document.getElementById('maximizeIcon'); 
+        const minimizeIcon = document.getElementById('minimizeIconProper'); 
 
 
         const studyPlanContext = `
@@ -539,7 +601,6 @@ Consistência, Mão na Massa, Construa um Portfólio, Não Tenha Medo de Errar, 
             if (storedProgress) {
                 userChecklistProgress = JSON.parse(storedProgress);
             }
-            // Apply progress to the master data
             checklistMasterData.forEach(item => {
                 if (!item.isTitle && userChecklistProgress.hasOwnProperty(item.id)) {
                     item.completed = userChecklistProgress[item.id];
@@ -549,31 +610,30 @@ Consistência, Mão na Massa, Construa um Portfólio, Não Tenha Medo de Errar, 
         }
         
         function renderChecklist() {
-            checklistContainer.innerHTML = ''; // Clear previous content
+            checklistContainer.innerHTML = ''; 
             if (loadingChecklistMsg) loadingChecklistMsg.style.display = 'none';
 
             let currentSectionDiv = null;
 
             checklistMasterData.forEach(item => {
                 if (item.isTitle) {
-                    // Create a new div for the section if it's a title
                     currentSectionDiv = document.createElement('div');
-                    currentSectionDiv.classList.add('checklist-section-items'); // For potential future styling of items within a section
+                    currentSectionDiv.classList.add('checklist-section-items'); 
                     
                     const titleElement = document.createElement('h3');
                     titleElement.textContent = item.sectionTitle;
                     titleElement.classList.add('checklist-section-title');
                     checklistContainer.appendChild(titleElement);
-                    checklistContainer.appendChild(currentSectionDiv); // Append the container for items of this section
-                } else if (currentSectionDiv) { // Ensure we have a section to add items to
+                    checklistContainer.appendChild(currentSectionDiv); 
+                } else if (currentSectionDiv) { 
                     const div = document.createElement('div');
                     div.classList.add('checklist-item');
                     
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.checked = item.completed;
-                    checkbox.id = `chk-${item.id}`; // Ensure unique DOM id for checkbox
-                    checkbox.dataset.itemId = item.id; // Store original item id
+                    checkbox.id = `chk-${item.id}`; 
+                    checkbox.dataset.itemId = item.id; 
                     checkbox.addEventListener('change', (e) => toggleComplete(e.target.dataset.itemId));
                     
                     const label = document.createElement('label');
@@ -585,7 +645,7 @@ Consistência, Mão na Massa, Construa um Portfólio, Não Tenha Medo de Errar, 
                     
                     div.appendChild(checkbox);
                     div.appendChild(label);
-                    currentSectionDiv.appendChild(div); // Add item to the current section's div
+                    currentSectionDiv.appendChild(div); 
                 }
             });
         }
@@ -594,15 +654,32 @@ Consistência, Mão na Massa, Construa um Portfólio, Não Tenha Medo de Errar, 
             const item = checklistMasterData.find(i => i.id === itemId && !i.isTitle);
             if (item) {
                 item.completed = !item.completed;
-                userChecklistProgress[itemId] = item.completed; // Update progress map
+                userChecklistProgress[itemId] = item.completed; 
                 saveChecklistProgress();
-                renderChecklist(); // Re-render to reflect changes (e.g., strikethrough)
+                renderChecklist(); 
             }
         }
-
-        // Initial load of checklist
         loadChecklistProgress();
 
+        // Maximize/Minimize Chat Functionality
+        if (toggleChatSizeButton) {
+            toggleChatSizeButton.addEventListener('click', () => {
+                iaChatSectionContainer.classList.toggle('ia-chat-maximized');
+                document.body.classList.toggle('chat-view-active');
+
+                const isMaximized = iaChatSectionContainer.classList.contains('ia-chat-maximized');
+                if (isMaximized) {
+                    maximizeIcon.classList.add('hidden');
+                    minimizeIcon.classList.remove('hidden');
+                    toggleChatSizeButton.setAttribute('title', 'Minimizar Chat');
+                    chatDisplay.scrollTop = chatDisplay.scrollHeight;
+                } else {
+                    maximizeIcon.classList.remove('hidden');
+                    minimizeIcon.classList.add('hidden');
+                    toggleChatSizeButton.setAttribute('title', 'Maximizar Chat');
+                }
+            });
+        }
     </script>
 </body>
-</html>
+</ht
